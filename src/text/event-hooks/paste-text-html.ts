@@ -80,6 +80,7 @@ function pasteTextHtml(editor: Editor, pasteEvents: Function[]) {
         let pasteText = getPasteText(e as ClipboardEvent)
         pasteText = pasteText.replace(/\n/gm, '<br>')
         // 当前选区所在的 DOM 节点
+        // debugger
         const $selectionElem = editor.selection.getSelectionContainerElem()
         if (!$selectionElem) {
             return
@@ -130,7 +131,12 @@ function pasteTextHtml(editor: Editor, pasteEvents: Function[]) {
                 // 如果是段落，为了兼容 firefox 和 chrome差异，自定义插入
                 if (isParagraphHtml(html)) {
                     const $textEl = editor.$textElem
-                    $textEl.append($(html))
+                    // 全选的情况下覆盖原有内容
+                    if ($textEl.equal($selectionElem)) {
+                        $textEl.replaceChildAll($(html))
+                    } else {
+                        $textEl.append($(html))
+                    }
                     // 如果选区是空段落，移除空段落
                     if (isEmptyParagraph($topElem)) {
                         $topElem.remove()
