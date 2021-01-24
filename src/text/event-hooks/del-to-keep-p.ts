@@ -33,6 +33,8 @@ function deleteToKeepP(editor: Editor, deleteUpEvents: Function[], deleteDownEve
     deleteUpEvents.push(upFn)
 
     function downFn(e: Event) {
+        // 按住不松实时保存选区
+        editor.selection.saveRange()
         const $textElem = editor.$textElem
         const txtHtml = $textElem.html().toLowerCase().trim()
         if (txtHtml === '<p><br></p>') {
