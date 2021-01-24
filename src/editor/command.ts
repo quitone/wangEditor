@@ -69,6 +69,10 @@ class Command {
         if (this.queryCommandSupported('insertHTML')) {
             // W3C
             this.execCommand('insertHTML', html)
+            if (html !== '&#8203;' && html !== '<strong>&#8203;</strong>') {
+                editor.selection.saveRange()
+                editor.selection.createEmptyRange()
+            }
         } else if (range.insertNode) {
             // IE
             range.deleteContents()
