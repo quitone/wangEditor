@@ -19,7 +19,8 @@ export interface validata<T> {
 /**
  * 设置值的验证过滤函数
  */
-export type validator = <T, K>(data: T) => validata<T | K>
+// 暂时放置
+export type validator = <T>(data: T) => validata<T>
 
 /**
  *  数据监听实现
@@ -27,24 +28,33 @@ export type validator = <T, K>(data: T) => validata<T | K>
  * @param {String} prop 被劫持对象的属性名
  * @param {Function} change 被劫持属性值发生变化时的回调
  * @param {Function}  validate 设置 prop 值前的数据验证和处理
+ * @param {Object} thisTar 执行 change 和 validate 时的 this 指向
  */
-export default function define(target, prop: string, change: changed, validate: validator) {
+export default function define<T, K>(
+    target,
+    prop: string,
+    change: (value: T | K) => void,
+    validate?: (value: T) => validata<T | K>,
+    thisTar?
+) {
     // 缓存值
     let temp = target[prop]
 
     let set = function (value) {
-        const { valid, data } = validate(value)
+        const { valid, data } = validate.call(thisTar, value)
         if (valid && data !== temp) {
             temp = data
-            change(temp)
+            change.call(thisTar, temp)
         }
         return temp
     }
 
     if (typeof validate !== 'function') {
         set = function (value) {
-            temp = value
-            change(temp)
+            if (value !== temp) {
+                temp = value
+                change.call(thisTar, temp)
+            }
             return temp
         }
     }
