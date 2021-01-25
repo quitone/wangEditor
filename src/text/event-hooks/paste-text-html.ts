@@ -82,6 +82,7 @@ function pasteTextHtml(editor: Editor, pasteEvents: Function[]) {
         // 当前选区所在的 DOM 节点
         // debugger
         const $selectionElem = editor.selection.getSelectionContainerElem()
+        console.log($selectionElem)
         if (!$selectionElem) {
             return
         }
@@ -133,7 +134,10 @@ function pasteTextHtml(editor: Editor, pasteEvents: Function[]) {
                     const $textEl = editor.$textElem
                     // 全选的情况下覆盖原有内容
                     if ($textEl.equal($selectionElem)) {
-                        $textEl.replaceChildAll($(html))
+                        editor.cmd.do('insertHTML', `${formatHtml(pasteHtml)}`)
+                        // 更新选区
+                        editor.selection.createEmptyRange()
+                        return
                     } else {
                         $textEl.append($(html))
                     }
